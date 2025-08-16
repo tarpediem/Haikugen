@@ -1,0 +1,47 @@
+# Production Docker Compose configuration
+version: '3.8'
+
+services:
+  haiku-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        VITE_OPENROUTER_API_KEY: ${VITE_OPENROUTER_API_KEY}
+    container_name: haikugen-prod
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - haiku-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.haikugen.rule=Host(`localhost`)"
+      - "traefik.http.services.haikugen.loadbalancer.server.port=80"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:rw,noexec,nosuid,size=100m
+      - /var/run:rw,noexec,nosuid,size=10m
+      - /tmp:rw,noexec,nosuid,size=10m
+
+networks:
+  haiku-network:
+    driver: bridge
+    name: haikugen-network

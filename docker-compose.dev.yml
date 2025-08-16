@@ -1,0 +1,49 @@
+# Development Docker Compose configuration
+version: '3.8'
+
+services:
+  haiku-app-dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: haikugen-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src:cached
+      - ./public:/app/public:cached
+      - ./index.html:/app/index.html:cached
+      - ./vite.config.ts:/app/vite.config.ts:cached
+      - ./tailwind.config.js:/app/tailwind.config.js:cached
+      - ./postcss.config.js:/app/postcss.config.js:cached
+      - ./tsconfig.json:/app/tsconfig.json:cached
+      - ./tsconfig.app.json:/app/tsconfig.app.json:cached
+      - ./tsconfig.node.json:/app/tsconfig.node.json:cached
+      # Exclude node_modules to avoid conflicts
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_OPENROUTER_API_KEY=${VITE_OPENROUTER_API_KEY}
+    env_file:
+      - .env
+    stdin_open: true
+    tty: true
+    networks:
+      - haiku-network-dev
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5173/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  haiku-network-dev:
+    driver: bridge
+    name: haikugen-dev-network
