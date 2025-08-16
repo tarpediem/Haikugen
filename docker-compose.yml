@@ -1,6 +1,4 @@
 # Production Docker Compose configuration
-version: '3.8'
-
 services:
   haiku-app:
     build:
@@ -35,11 +33,9 @@ services:
         max-file: "3"
     security_opt:
       - no-new-privileges:true
-    read_only: true
+    # Use tmpfs for /tmp to handle temporary files securely
     tmpfs:
-      - /var/cache/nginx:rw,noexec,nosuid,size=100m
-      - /var/run:rw,noexec,nosuid,size=10m
-      - /tmp:rw,noexec,nosuid,size=10m
+      - /tmp:rw,noexec,nosuid,size=100m
 
 networks:
   haiku-network:

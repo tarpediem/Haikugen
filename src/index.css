@@ -6,7 +6,7 @@
 /* Custom CSS variables for zen colors */
 :root {
   --zen-white: #FEFEFE;
-  --zen-black: #1A1A1A;
+  --zen-black: #000000;
   --zen-charcoal: #2D2D2D;
   --zen-vermillion: #E60012;
   --zen-gold: #FFD700;
@@ -20,14 +20,7 @@ body {
   font-family: 'Noto Sans JP', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   margin: 0;
   min-height: 100vh;
-  background-color: var(--zen-white);
-  color: var(--zen-black);
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.dark body {
-  background-color: var(--zen-charcoal);
-  color: var(--zen-white);
 }
 
 /* Custom scrollbar */
@@ -39,9 +32,6 @@ body {
   background-color: var(--zen-mist);
 }
 
-.dark ::-webkit-scrollbar-track {
-  background-color: var(--zen-shadow);
-}
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--zen-vermillion);
@@ -57,10 +47,6 @@ body {
   transition: all 0.3s ease;
 }
 
-.dark .zen-card {
-  background-color: var(--zen-black);
-  border-color: var(--zen-shadow);
-}
 
 .zen-input {
   width: 100%;
@@ -72,11 +58,6 @@ body {
   transition: all 0.2s ease;
 }
 
-.dark .zen-input {
-  border-color: var(--zen-shadow);
-  background-color: var(--zen-charcoal);
-  color: var(--zen-white);
-}
 
 .zen-input:focus {
   outline: none;
@@ -88,9 +69,6 @@ body {
   color: var(--zen-shadow);
 }
 
-.dark .zen-input::placeholder {
-  color: var(--zen-mist);
-}
 
 .zen-button {
   padding: 0.75rem 1.5rem;
@@ -127,18 +105,11 @@ body {
   color: var(--zen-black);
 }
 
-.dark .zen-button-secondary {
-  background-color: var(--zen-shadow);
-  color: var(--zen-white);
-}
 
 .zen-button-secondary:hover {
   background-color: var(--zen-silver);
 }
 
-.dark .zen-button-secondary:hover {
-  background-color: var(--zen-charcoal);
-}
 
 .haiku-text {
   font-family: 'Noto Serif JP', Georgia, serif;
@@ -184,6 +155,72 @@ body {
   }
 }
 
+/* Background Animations */
+@keyframes particle-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate3d(-10px, -15px, 0) rotate(90deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate3d(15px, -10px, 0) rotate(180deg);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate3d(-5px, -20px, 0) rotate(270deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes zen-wave {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0px);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+@keyframes cherry-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.6s ease-in-out;
 }
@@ -194,6 +231,137 @@ body {
 
 .breathing {
   animation: breathing 4s ease-in-out infinite;
+}
+
+/* Enhanced Background Animation Utilities */
+.animate-particle-float {
+  animation: particle-float 15s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 400% 400%;
+  animation: gradient-shift 12s ease-in-out infinite;
+}
+
+.animate-zen-wave {
+  animation: zen-wave 8s ease-in-out infinite;
+}
+
+.animate-cherry-fall {
+  animation: cherry-fall 25s linear infinite;
+}
+
+.animate-ripple {
+  animation: ripple 4s ease-out infinite;
+}
+
+/* Background Particle System */
+.zen-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.zen-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.zen-particle.small {
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, var(--zen-vermillion), rgba(230, 0, 18, 0.3));
+  opacity: 0.4;
+  box-shadow: 0 0 6px rgba(230, 0, 18, 0.2);
+}
+
+
+.zen-particle.medium {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(45deg, var(--zen-sage), var(--zen-gold));
+  opacity: 0.3;
+  box-shadow: 0 0 8px rgba(156, 175, 136, 0.3);
+}
+
+
+.zen-particle.large {
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, var(--zen-gold), rgba(255, 215, 0, 0.4));
+  opacity: 0.2;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+}
+
+
+/* Enhanced Cherry Blossom Petals */
+.cherry-petal {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(45deg, #FFB6C1, #FFC0CB, #FFCCCB);
+  border-radius: 0 100% 0 100%;
+  opacity: 0.7;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(255, 192, 203, 0.4);
+  filter: blur(0.5px);
+}
+
+
+/* Enhanced Zen Wave Lines */
+.zen-wave {
+  position: absolute;
+  left: 50%;
+  width: 300px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--zen-vermillion), var(--zen-gold), var(--zen-vermillion), transparent);
+  opacity: 0.4;
+  box-shadow: 0 0 4px rgba(230, 0, 18, 0.3);
+}
+
+
+/* Enhanced Gradient Background Overlays */
+.zen-gradient-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(230, 0, 18, 0.03),
+    rgba(255, 215, 0, 0.04),
+    rgba(156, 175, 136, 0.03),
+    rgba(255, 182, 193, 0.02),
+    rgba(230, 0, 18, 0.03)
+  );
+  opacity: 0.8;
+}
+
+
+/* Reduce motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-particle-float,
+  .animate-gradient-shift,
+  .animate-zen-wave,
+  .animate-cherry-fall,
+  .animate-ripple,
+  .floating,
+  .breathing {
+    animation: none;
+  }
+  
+  .zen-gradient-overlay {
+    background: none;
+  }
 }
 
 /* Zen divider */
@@ -210,9 +378,6 @@ body {
 .text-zen-shadow { color: var(--zen-shadow); }
 .text-zen-mist { color: var(--zen-mist); }
 
-.dark .text-zen-black { color: var(--zen-white); }
-.dark .text-zen-white { color: var(--zen-white); }
-.dark .text-zen-shadow { color: var(--zen-mist); }
 
 .bg-zen-white { background-color: var(--zen-white); }
 .bg-zen-charcoal { background-color: var(--zen-charcoal); }
@@ -399,9 +564,6 @@ body {
 .hover\\:bg-zen-shadow:hover { background-color: var(--zen-shadow); }
 .hover\\:border-zen-vermillion:hover { border-color: var(--zen-vermillion); }
 
-.dark .hover\\:text-zen-white:hover { color: var(--zen-white); }
-.dark .hover\\:bg-zen-shadow:hover { background-color: var(--zen-shadow); }
-.dark .hover\\:bg-zen-charcoal:hover { background-color: var(--zen-charcoal); }
 
 .focus\\:outline-none:focus { outline: none; }
 .focus\\:ring-2:focus { box-shadow: 0 0 0 2px var(--zen-vermillion); }

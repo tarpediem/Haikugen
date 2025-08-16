@@ -36,17 +36,13 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-# Create nginx cache directories with proper permissions
-RUN mkdir -p /var/cache/nginx/client_temp \
-    /var/cache/nginx/proxy_temp \
-    /var/cache/nginx/fastcgi_temp \
-    /var/cache/nginx/uwsgi_temp \
-    /var/cache/nginx/scgi_temp && \
-    chown -R nginx:nginx /var/cache/nginx
-
-# Create nginx pid directory
-RUN mkdir -p /var/run/nginx && \
-    chown -R nginx:nginx /var/run/nginx
+# Create temporary directories in /tmp (no permission issues)
+RUN mkdir -p /tmp/client_temp \
+    /tmp/proxy_temp \
+    /tmp/fastcgi_temp \
+    /tmp/uwsgi_temp \
+    /tmp/scgi_temp && \
+    chmod -R 777 /tmp
 
 # Set proper permissions for nginx html directory
 RUN chown -R nginx:nginx /usr/share/nginx/html

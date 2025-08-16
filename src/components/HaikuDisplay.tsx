@@ -9,6 +9,7 @@ interface HaikuDisplayProps {
   onRegenerate?: () => void;
   onSave?: (haiku: Haiku) => void;
   onExportImage?: (haiku: Haiku) => void;
+  onDemoMode?: () => void;
 }
 
 export default function HaikuDisplay({
@@ -17,7 +18,8 @@ export default function HaikuDisplay({
   error = null,
   onRegenerate,
   onSave,
-  onExportImage
+  onExportImage,
+  onDemoMode
 }: HaikuDisplayProps) {
   const [showSyllables, setShowSyllables] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -76,17 +78,35 @@ export default function HaikuDisplay({
         <h3 className="text-lg font-medium text-red-700 dark:text-red-400 mb-2">
           Erreur de génération
         </h3>
-        <p className="text-red-600 dark:text-red-300 mb-4 text-sm">
-          {error}
-        </p>
-        {onRegenerate && (
-          <button
-            onClick={onRegenerate}
-            className="zen-button-primary"
-          >
-            Réessayer
-          </button>
-        )}
+        <div className="text-red-600 dark:text-red-300 mb-4 text-sm space-y-2">
+          {error.split('\n').map((line, index) => (
+            <p key={index} className={line.includes('💡') ? 'mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800' : ''}>
+              {line}
+            </p>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-3 justify-center">
+          {onRegenerate && (
+            <button
+              onClick={onRegenerate}
+              className="zen-button-primary"
+            >
+              Réessayer
+            </button>
+          )}
+          
+          {onDemoMode && error?.includes('💡') && (
+            <button
+              onClick={onDemoMode}
+              className="zen-button-secondary bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 hover:from-blue-600 hover:to-purple-600"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-5-9a3 3 0 110 6M7 10a3 3 0 110 6m3 4a8.001 8.001 0 01-8-8 8.001 8.001 0 0116 0 8.003 8.003 0 01-8 8z" />
+              </svg>
+              Essayer le mode démo
+            </button>
+          )}
+        </div>
       </div>
     );
   }

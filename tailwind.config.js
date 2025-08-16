@@ -4,14 +4,13 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         // Japanese-inspired palette
         zen: {
           white: '#FEFEFE',
-          black: '#1A1A1A',
+          black: '#000000',
           charcoal: '#2D2D2D',
           vermillion: '#E60012',
           gold: '#FFD700',

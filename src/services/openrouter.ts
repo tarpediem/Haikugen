@@ -117,7 +117,23 @@ Réponds uniquement avec le haïku, rien d'autre.`;
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Erreur inconnue'}`);
+        
+        // Provide more specific error messages
+        let errorMessage = 'Erreur inconnue';
+        
+        if (response.status === 401) {
+          errorMessage = 'Clé API invalide. Vérifiez votre configuration OpenRouter.';
+        } else if (response.status === 403) {
+          errorMessage = 'Accès refusé. Vérifiez les permissions de votre clé API.';
+        } else if (response.status === 429) {
+          errorMessage = 'Limite de requêtes atteinte. Veuillez patienter avant de réessayer.';
+        } else if (response.status >= 500) {
+          errorMessage = 'Erreur serveur OpenRouter. Veuillez réessayer plus tard.';
+        } else if (errorData.error?.message) {
+          errorMessage = `Erreur API: ${errorData.error.message}`;
+        }
+        
+        throw new Error(`${errorMessage} (Code: ${response.status})`);
       }
 
       const data = await response.json();
@@ -155,15 +171,30 @@ Réponds uniquement avec le haïku, rien d'autre.`;
     } catch (error) {
       console.error('Erreur génération haïku:', error);
       
+      const errorMessage = (error as Error).message;
+      let userFriendlyMessage = errorMessage;
+      
+      // Provide more specific error messages for common issues
+      if (errorMessage.includes('CORS')) {
+        userFriendlyMessage = 'Erreur CORS: L\'API OpenRouter ne peut pas être contactée depuis le navigateur. Utilisez un proxy ou configurez CORS.';
+      } else if (errorMessage.includes('fetch')) {
+        userFriendlyMessage = 'Erreur de connexion: Impossible de contacter l\'API OpenRouter. Vérifiez votre connexion internet.';
+      } else if (errorMessage.includes('Failed to fetch')) {
+        userFriendlyMessage = 'Erreur réseau: L\'API OpenRouter n\'est pas accessible. Vérifiez votre connexion ou réessayez plus tard.';
+      } else if (errorMessage.includes('timeout')) {
+        userFriendlyMessage = 'Délai d\'attente dépassé: L\'API OpenRouter met trop de temps à répondre.';
+      }
+      
       // If we have retries left and it's a network error, try again
-      if (retries > 0 && (error as Error).message.includes('fetch')) {
+      if (retries > 0 && (errorMessage.includes('fetch') || errorMessage.includes('timeout') || errorMessage.includes('CORS'))) {
+        console.warn(`Tentative de nouvelle requête (${retries} essais restants)`);
         return this.generateHaiku(request, retries - 1);
       }
 
       return {
         haiku: { lines: ['', '', ''], theme: request.theme, keywords: request.keywords, syllables: [0, 0, 0] },
         success: false,
-        error: (error as Error).message
+        error: userFriendlyMessage
       };
     }
   }

@@ -95,7 +95,7 @@ export default function WordInput({
 
         {/* Input field */}
         {canAddMore && (
-          <div className="relative">
+          <div className="space-y-2">
             <input
               ref={inputRef}
               type="text"
@@ -105,9 +105,9 @@ export default function WordInput({
               onBlur={addKeyword}
               placeholder={placeholder}
               disabled={disabled}
-              className="zen-input border-none bg-transparent focus:ring-0 focus:border-none p-0 placeholder-zen-shadow/50 dark:placeholder-zen-mist/50"
+              className="zen-input border-none bg-transparent focus:ring-0 focus:border-none p-0 placeholder-zen-shadow/50 dark:placeholder-zen-mist/50 w-full"
             />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-zen-shadow dark:text-zen-mist">
+            <div className="text-xs text-zen-shadow dark:text-zen-mist text-right opacity-70">
               Entrée ou virgule pour ajouter
             </div>
           </div>

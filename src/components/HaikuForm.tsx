@@ -5,14 +5,18 @@ import type { HaikuFormData } from '../types/haiku';
 
 interface HaikuFormProps {
   onSubmit: (data: HaikuFormData) => void;
+  onDemoSubmit?: (data: HaikuFormData) => void;
   isLoading?: boolean;
   initialData?: Partial<HaikuFormData>;
+  showDemoOption?: boolean;
 }
 
 export default function HaikuForm({
   onSubmit,
+  onDemoSubmit,
   isLoading = false,
-  initialData = {}
+  initialData = {},
+  showDemoOption = false
 }: HaikuFormProps) {
   const [formData, setFormData] = useState<HaikuFormData>({
     keywords: initialData.keywords || [],
@@ -165,6 +169,20 @@ export default function HaikuForm({
             </svg>
             Exemple rapide
           </button>
+
+          {showDemoOption && onDemoSubmit && (
+            <button
+              type="button"
+              onClick={() => onDemoSubmit(formData)}
+              disabled={isLoading || !isFormValid}
+              className="zen-button-primary flex items-center justify-center gap-2 bg-gradient-to-r from-zen-vermillion to-red-500 hover:from-zen-vermillion/90 hover:to-red-500/90"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-5-9a3 3 0 110 6M7 10a3 3 0 110 6m3 4a8.001 8.001 0 01-8-8 8.001 8.001 0 0116 0 8.003 8.003 0 01-8 8z" />
+              </svg>
+              Mode démo
+            </button>
+          )}
         </div>
 
         {/* Form Status */}
