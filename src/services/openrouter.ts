@@ -24,23 +24,54 @@ export class OpenRouterService {
   }
 
   /**
+   * Update API configuration
+   */
+  updateConfig(apiKey: string, model?: string): void {
+    this.apiKey = apiKey;
+    if (model) {
+      this.model = model;
+    }
+  }
+
+  /**
    * Generate system prompt for haiku creation
    */
   private createSystemPrompt(): string {
-    return `Tu es un maître poète spécialisé dans la création de haïkus traditionnels japonais.
+    return `Tu es un maître poète japonais expert en création de haïkus authentiques.
 
-Règles strictes à respecter:
-1. Structure exacte: 5 syllabes (ligne 1), 7 syllabes (ligne 2), 5 syllabes (ligne 3)
-2. Incorporer les mots-clés fournis de manière naturelle et poétique
-3. Respecter le thème choisi avec subtilité
-4. Capturer un moment précis, une émotion ou une observation
-5. Utiliser des images concrètes et sensorielles
-6. Éviter les rimes forcées
-7. Créer une césure ou un tournant surprenant entre les lignes
-8. Répondre UNIQUEMENT avec les 3 lignes du haïku, séparées par des retours à la ligne
-9. Pas d'explication, pas de commentaire, juste le haïku
+RÈGLES ABSOLUES - AUCUNE EXCEPTION:
+1. STRUCTURE OBLIGATOIRE: exactement 5-7-5 syllabes
+   - Ligne 1: EXACTEMENT 5 syllabes
+   - Ligne 2: EXACTEMENT 7 syllabes  
+   - Ligne 3: EXACTEMENT 5 syllabes
 
-Le haïku doit être en français et respecter parfaitement la structure 5-7-5 syllabes.`;
+2. COMPTAGE DES SYLLABES EN FRANÇAIS:
+   - Compter chaque voyelle ou groupe de voyelles = 1 syllabe
+   - "eau" = 1 syllabe, "oi" = 1 syllabe, "ion" = 1 syllabe
+   - "e" muet en fin de mot ne compte PAS
+   - Exemple: "so-leil" = 2 syllabes, "fleur" = 1 syllabe
+
+3. STRUCTURE TRADITIONNELLE:
+   - Ligne 1: Image ou situation (présent)
+   - Ligne 2: Action ou développement (présent)
+   - Ligne 3: Révélation ou contraste (souvent passé/futur)
+
+4. STYLE HAÏKU:
+   - Pas de métaphores complexes
+   - Images simples et directes
+   - Éviter "le", "la", "les" quand possible
+   - Pas de rimes
+   - Capturer un instant précis
+
+EXEMPLES PARFAITS:
+Cerf dans le bois (5)
+Branche qui craque sous mes pas (7)
+Il a disparu (5)
+
+VÉRIFICATION OBLIGATOIRE:
+Compte tes syllabes AVANT de répondre. Si ce n'est pas 5-7-5, recommence.
+
+Réponds UNIQUEMENT avec les 3 lignes du haïku, rien d'autre.`;
   }
 
   /**
@@ -50,14 +81,18 @@ Le haïku doit être en français et respecter parfaitement la structure 5-7-5 s
     const theme = request.customTheme || request.theme;
     const keywordsText = request.keywords.join(', ');
     
-    return `Crée un haïku sur le thème "${theme}" en incorporant ces mots-clés: ${keywordsText}
+    return `Thème: "${theme}"
+Mots-clés à intégrer naturellement: ${keywordsText}
 
-Rappel de la structure requise:
-- Ligne 1: exactement 5 syllabes
-- Ligne 2: exactement 7 syllabes  
-- Ligne 3: exactement 5 syllabes
+INSTRUCTIONS CRUCIALES:
+1. Compte chaque syllabe: so-leil = 2, fleur = 1, beau = 1
+2. Structure: 5 syllabes / 7 syllabes / 5 syllabes
+3. Évite les articles inutiles
+4. Capture un moment précis lié au thème
+5. Intègre les mots-clés de façon poétique
 
-Réponds uniquement avec le haïku, rien d'autre.`;
+VÉRIFIE: Compte tes syllabes ligne par ligne AVANT de répondre.
+Format de réponse: 3 lignes seulement, pas de commentaire.`;
   }
 
   /**
@@ -99,7 +134,7 @@ Réponds uniquement avec le haïku, rien d'autre.`;
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.apiKey}`,
           'HTTP-Referer': window.location.origin,
-          'X-Title': 'Haiku Generator'
+          'X-Title': 'Haikugen - AI Haiku Generator'
         },
         body: JSON.stringify({
           model: this.model,
@@ -154,8 +189,15 @@ Réponds uniquement avec le haïku, rien d'autre.`;
       
       // If structure is invalid and we have retries left, try again
       if (!validation.isValid && retries > 0) {
-        console.warn('Structure de haïku invalide, nouvelle tentative...', validation.errors);
-        return this.generateHaiku(request, retries - 1);
+        console.warn(`Structure de haïku invalide (${validation.syllables.join('-')}), nouvelle tentative...`, validation.errors);
+        
+        // Add more specific instructions for retry
+        const retryRequest = {
+          ...request,
+          customTheme: `${request.customTheme || request.theme} - ATTENTION: Le haïku précédent avait ${validation.syllables.join('-')} syllabes au lieu de 5-7-5. Compte TRÈS attentivement chaque syllabe.`
+        };
+        
+        return this.generateHaiku(retryRequest, retries - 1);
       }
 
       return {

@@ -5,7 +5,12 @@
 
 // French vowel patterns for syllable counting
 const VOWELS = 'aeiouyàáâäèéêëìíîïòóôöùúûü';
-const VOWEL_GROUPS = ['ai', 'au', 'eau', 'eu', 'ou', 'oi', 'ei', 'an', 'en', 'in', 'on', 'un'];
+const VOWEL_GROUPS = [
+  'eau', 'eau', 'eaux', // 3-letter first to avoid conflicts
+  'ai', 'au', 'eu', 'ou', 'oi', 'ei', 'ay', 'ey', 'oy', 'uy',
+  'an', 'en', 'in', 'on', 'un', 'am', 'em', 'im', 'om', 'um',
+  'ion', 'tion', 'sion'
+];
 
 /**
  * Count syllables in a French word using basic phonetic rules
@@ -18,18 +23,27 @@ export function countSyllablesInWord(word: string): number {
   
   if (cleanWord.length === 0) return 0;
   
-  // Handle vowel groups first
+  // Handle vowel groups first (longer patterns first)
   let processedWord = cleanWord;
-  for (const group of VOWEL_GROUPS) {
-    processedWord = processedWord.replace(new RegExp(group, 'g'), 'X');
+  const sortedGroups = VOWEL_GROUPS.sort((a, b) => b.length - a.length);
+  
+  for (const group of sortedGroups) {
+    const regex = new RegExp(group, 'g');
+    const matches = processedWord.match(regex);
+    if (matches) {
+      syllableCount += matches.length;
+      processedWord = processedWord.replace(regex, 'X'.repeat(group.length));
+    }
   }
   
-  // Count remaining vowels
+  // Count remaining single vowels
   for (let i = 0; i < processedWord.length; i++) {
-    if (VOWELS.includes(processedWord[i])) {
+    if (VOWELS.includes(processedWord[i]) && processedWord[i] !== 'X') {
       syllableCount++;
       // Skip consecutive vowels that aren't already handled
-      while (i + 1 < processedWord.length && VOWELS.includes(processedWord[i + 1])) {
+      while (i + 1 < processedWord.length && 
+             VOWELS.includes(processedWord[i + 1]) && 
+             processedWord[i + 1] !== 'X') {
         i++;
       }
     }

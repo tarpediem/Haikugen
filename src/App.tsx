@@ -3,6 +3,7 @@ import Header from './components/Header';
 import HaikuForm from './components/HaikuForm';
 import HaikuDisplay from './components/HaikuDisplay';
 import ZenBackground from './components/ZenBackground';
+import Settings from './components/Settings';
 import { useHaikuHistory } from './hooks/useHaikuHistory';
 import { openRouterService } from './services/openrouter';
 import type { Haiku, HaikuFormData } from './types/haiku';
@@ -12,6 +13,7 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   
   const { history, addToHistory } = useHaikuHistory();
 
@@ -147,6 +149,7 @@ function App() {
       <Header 
         onShowHistory={() => setShowHistory(!showHistory)}
         historyCount={history.length}
+        onShowSettings={() => setShowSettings(true)}
       />
       
       <main className="max-w-4xl mx-auto px-4 py-8 relative z-10">
@@ -263,6 +266,12 @@ function App() {
           </p>
         </footer>
       </main>
+
+      {/* Settings Modal */}
+      <Settings 
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
     </div>
   );
 }
